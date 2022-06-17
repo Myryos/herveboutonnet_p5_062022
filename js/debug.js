@@ -1,6 +1,4 @@
-function debug(val, timer)
+function debug(mess, val)
 {
-    setTimeout(function(){
-        console.log("Debug #" + val);
-}   ,timer);
+    console.log(mess + val);
 }

@@ -19,21 +19,28 @@ for (var i = 0; i< productsCart.length; i++)
 }
 
 setTimeout(function(){
+    let items = document.getElementById("cart__items");
     var totalQuantity = document.getElementById("totalQuantity");
     var totalPrice = document.getElementById("totalPrice");
     var btnOrder = document.getElementById("order");
-    for(var i = 0; i < productsCart.length; i++)
+    
+    //creation
+    parseProducts(productsInfos, items, "cart", productsCart);
+    /*for(var i = 0; i < productsCart.length; i++)
     {
         createItem(productsCart[i].id,
         productsCart[i].couleur, productsInfos[i].name,
          productsInfos[i].imageUrl,productsInfos[i].altText, 
          productsInfos[i].price, productsCart[i].quantite);
-    };
+    };*/
+
+    //SET
     totalPrice.innerHTML = setCartPrice(productsCart, productsInfos);
     totalQuantity.innerHTML = setCartQuant(productsCart);
 
     setInterval(() => 
     {
+        //Faire un onChange
         updateCart();
         updateItemQuant(productsCart);
     }, 1000);
@@ -58,7 +65,7 @@ function createItem(id, colors, name, url, alt, priceP, quantityP)
         var quant = document.createElement("p");
         var input = document.createElement("input");
         var divContentDel = document.createElement("div");
-        var delItem = document.createElement("p")
+        var delItem = document.createElement("p");
         
         list_items.appendChild(article);
         article.appendChild(divImg);
@@ -91,6 +98,7 @@ function createItem(id, colors, name, url, alt, priceP, quantityP)
         article.setAttribute("data-color","{ " + colors + " }");
         article.setAttribute("id", id);
 
+
         //Attribute img
         img.setAttribute("src", url);
         img.setAttribute("alt", alt);
@@ -103,13 +111,13 @@ function createItem(id, colors, name, url, alt, priceP, quantityP)
         input.setAttribute("value", quantityP);
         input.setAttribute("id", "itemQuantity");
 
+
         //Attribute Price
         price.setAttribute("id", "price");
 
         //Attribute DelItem
         delItem.setAttribute("id", "deleteItem");
         delItem.onclick = function(){delEventListener(name, id)};
-
 
         //innerTextHTML
         h2.innerHTML = name;
@@ -159,6 +167,7 @@ function delEventListener(str, id)
 
 function updateCart()
 {
+    //Changer les id  par des class
     var allQuant = document.querySelectorAll("[id=itemQuantity]");
     var allPrice = document.querySelectorAll("[id=price]");
 
@@ -177,9 +186,7 @@ function updateItemQuant(array)
     {
         if(array[i].quantite != allQuant[i].value)
         {
-            console.log("Quantite avant : " + array[i].quantite);
             array[i].quantite = allQuant[i].value;
-            console.log("Quantite apres : " + array[i].quantite);
         }
     }
 }
@@ -257,7 +264,8 @@ function submitOrder(array)
 function productArray(array)
 {
     var r = []
-    array.forEach(element => {
+    array.forEach(element => 
+    {
         for (var i = 0; i < element.quantite; i++)
         {
             r.push(element.id);
