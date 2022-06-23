@@ -1,13 +1,14 @@
-let items = document.getElementById("items");
+onCreate();
 
-let json = requestAPI(" ", false);
-
-setTimeout(function(){
-    parseProducts(json, items, "all")
-}, 250);
-
-
-function asyncCall()
+function onCreate()
 {
-
+    let items = document.getElementById("items");
+    requestAPI(" ", false)
+    .then(function(json)
+    {
+        parseProducts(json, items, "all");
+    })
+    .catch(function(msg){
+        debug(msg, "");
+    });
 }

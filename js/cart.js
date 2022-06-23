@@ -1,130 +1,107 @@
-let productsCart = [];
-let productsInfos = [];
+var productsCart = [];
+onCreate();
 
-for (var x = 0; x < sessionStorage.length; x++){
-    productsCart.push(JSON.parse(sessionStorage.getItem(sessionStorage.key(x))));
-  };
-for (var i = 0; i< productsCart.length; i++)
-{
-    fetch("http://localhost:3000/api/products/"+productsCart[i].id).then(function(res){
-    if (res.ok)
-    {
-        return res.json();
-    }
-})
-.then(function(value)
-{
-    productsInfos.push(value);
-});
-}
 
-setTimeout(function(){
-    let items = document.getElementById("cart__items");
+async function onCreate()
+{
+
+    let productsInfos = [];
+    var items = document.getElementById("cart__items");;
+    var btnOrder = document.getElementById("order");
     var totalQuantity = document.getElementById("totalQuantity");
     var totalPrice = document.getElementById("totalPrice");
-    var btnOrder = document.getElementById("order");
+    var fName = document.getElementById("firstName");
+    var lName = document.getElementById("lastName");
+    var addr = document.getElementById("address");
+    var city = document.getElementById("city");
+    var mail = document.getElementById("email");
+    let isOk = false;
     
-    //creation
-    parseProducts(productsInfos, items, "cart", productsCart);
-    /*for(var i = 0; i < productsCart.length; i++)
+    for (var x = 0; x < localStorage.length; x++)
     {
-        createItem(productsCart[i].id,
-        productsCart[i].couleur, productsInfos[i].name,
-         productsInfos[i].imageUrl,productsInfos[i].altText, 
-         productsInfos[i].price, productsCart[i].quantite);
-    };*/
+        productsCart.push(JSON.parse(localStorage.getItem(localStorage.key(x))));
+    };
+
+    getInfo(productsCart)
+    .then(function(array)
+    {
+        productsInfos = array;
+        parseProducts(productsInfos, items, "cart", productsCart);
+
+        totalPrice.innerHTML = setCartPrice(productsCart, productsInfos);
+        totalQuantity.innerHTML = setCartQuant(productsCart);
+
+        items.onchange = function()
+        {
+            updateCart(totalQuantity, totalPrice);
+        };
+        items.onclick =function(){
+    
+            updateCart(totalQuantity, totalPrice);
+        };
+
+        var delItems = document.querySelectorAll("[class=deleteItem]");
+        delItems.forEach(element => {
+            element.onclick = function()
+            {
+                for(var i = 0; i < productsCart.length; i++)
+                {
+                    delEventListener(element, productsCart[i].id);
+                }
+            }   
+        });
+    });
 
     //SET
-    totalPrice.innerHTML = setCartPrice(productsCart, productsInfos);
-    totalQuantity.innerHTML = setCartQuant(productsCart);
 
-    setInterval(() => 
-    {
-        //Faire un onChange
-        updateCart();
-        updateItemQuant(productsCart);
-    }, 1000);
+    fName.onchange = function(){
+        //test le pattern/value
+        isOk = checkRegEx(fName);
+    };
+    lName.onchange = function(){
+        //test le pattern/value
+        isOk = checkRegEx(lName);
+    };
+    addr.onchange = function(){
+        isOk = checkRegEx(addr);
+    }
+    city.onchange = function(){
+        isOk = checkRegEx(city);
+    }
+    mail.onchange = function(){
+        isOk = checkRegEx(mail);
+    }
 
     btnOrder.onclick = function(){
-        submitOrder(productsCart)};
-},1000);
-
-function createItem(id, colors, name, url, alt, priceP, quantityP)
-{
-        var list_items = document.getElementById("cart__items");
-        var article = document.createElement("article");
-        var divImg = document.createElement("div");
-        var img = document.createElement("img");
-        var divContent = document.createElement("div");
-        var divContentDesc = document.createElement("div");
-        var h2 = document.createElement("h2");
-        var color = document.createElement("p");
-        var price = document.createElement("p");
-        var divContentSett = document.createElement("div");
-        var divContentQuant = document.createElement("div");
-        var quant = document.createElement("p");
-        var input = document.createElement("input");
-        var divContentDel = document.createElement("div");
-        var delItem = document.createElement("p");
+        if(isOk)
+            submitOrder(productsCart, fName, lName, addr, city, mail);
+    };
         
-        list_items.appendChild(article);
-        article.appendChild(divImg);
-        divImg.appendChild(img);
-        article.appendChild(divContent);
-        divContent.appendChild(divContentDesc);
-        divContentDesc.appendChild(h2);
-        divContentDesc.appendChild(color);
-        divContentDesc.appendChild(price);
-        divContent.appendChild(divContentSett);
-        divContentSett.appendChild(divContentQuant);
-        divContentQuant.appendChild(quant);
-        divContentQuant.appendChild(input);
-        divContentSett.appendChild(divContentDel);
-        divContentDel.appendChild(delItem);
+        
+}
+//submitOrder(productsCart)
 
-        //set class
-        article.setAttribute("class","cart__item");
-        divImg.setAttribute("class", "cart__item__img");
-        divContent.setAttribute("class", "cart__item__content");
-        divContentDesc.setAttribute("class", "cart__item__content__description");
-        divContentSett.setAttribute("class", "cart__item__content__settings");
-        divContentQuant.setAttribute("class", "cart__item__content__settings__quantity");
-        input.setAttribute("class","itemQuantity");
-        divContentDel.setAttribute("class", "cart__item__content__settings__delete");
-        delItem.setAttribute("class", "deleteItem");
-
-        //Attribute article
-        article.setAttribute("data-id","{ " + id + " }");
-        article.setAttribute("data-color","{ " + colors + " }");
-        article.setAttribute("id", id);
-
-
-        //Attribute img
-        img.setAttribute("src", url);
-        img.setAttribute("alt", alt);
-
-        //Attribute input
-        input.setAttribute("type","number");
-        input.setAttribute("name","itemQuantity");
-        input.setAttribute("min","1");
-        input.setAttribute("max","100");
-        input.setAttribute("value", quantityP);
-        input.setAttribute("id", "itemQuantity");
-
-
-        //Attribute Price
-        price.setAttribute("id", "price");
-
-        //Attribute DelItem
-        delItem.setAttribute("id", "deleteItem");
-        delItem.onclick = function(){delEventListener(name, id)};
-
-        //innerTextHTML
-        h2.innerHTML = name;
-        color.innerHTML = colors;
-        price.innerHTML = priceP + " €";
-        quant.innerHTML = "Qté : ";
-        delItem.innerHTML = "Supprimer";
+function getInfo(array)
+{
+    return new Promise((resolve, reject) => {
+        let info = [];
+        for (var i = 0; i < array.length; i++)
+        {
+            requestAPI(array[i].id, false)
+            .then(function(jsons)
+            {
+                jsons.forEach(json => 
+                {
+                    info.push(json)
+                    if(info.length == array.length)
+                    {
+                        resolve(info)
+                    }
+                });
+            });
+        }
+    })
+    
 }
 
 function setCartQuant(cart)
@@ -149,10 +126,12 @@ function setCartPrice(cart, info)
     return pp;
 }
 
-function delEventListener(str, id)
+
+function delEventListener(element, id)
 {
-    var balise = document.getElementById(id);
-    sessionStorage.removeItem(str);
+    parent = getGrandParent(element);
+
+    localStorage.removeItem(element.id);
 
     for(var i = 0; i < productsCart.length; i++)
     {
@@ -161,27 +140,23 @@ function delEventListener(str, id)
             var tmp = productsCart.splice(i, 1);
         }
     }
-
-    balise.remove();
+    parent.remove();  
 }
 
-function updateCart()
+function updateCart(totalQ,totalP)
 {
-    //Changer les id  par des class
-    var allQuant = document.querySelectorAll("[id=itemQuantity]");
-    var allPrice = document.querySelectorAll("[id=price]");
+    var allQuant = document.querySelectorAll("[class=itemQuantity]");
+    var allPrice = document.querySelectorAll("[class=price]");
 
-    var totalQ = document.getElementById("totalQuantity");
-    var totalP = document.getElementById("totalPrice");
 
     totalQ.innerHTML = updateCartQuant(allQuant);
     totalP.innerHTML = updateCartPrice(allQuant, allPrice);
+    
+    updateItemQuant(productsCart, allQuant);
 }
 
-function updateItemQuant(array)
+function updateItemQuant(array,allQuant)
 {
-    var allQuant = document.querySelectorAll("[id=itemQuantity]");
-    
     for(var i = 0; i < array.length; i++)
     {
         if(array[i].quantite != allQuant[i].value)
@@ -213,13 +188,8 @@ function updateCartPrice(array0, array1)
     return r;
 }
 
-function submitOrder(array)
+function submitOrder(array, fName, lName, addr, city, mail)
 {
-    var fName = document.getElementById("firstName");
-    var lName = document.getElementById("lastName");
-    var addr = document.getElementById("address");
-    var city = document.getElementById("city");
-    var mail = document.getElementById("email");
 
     var url = document.location.href.replace("cart.html", "");
 
@@ -233,32 +203,17 @@ function submitOrder(array)
         },
         "products" : productArray(array)
     }
-    
-    var init = {
-        method : "POST",
-        "headers" : {
-
-            "Accept" : "application/json",
-            "Content-Type" : "application/json; charset=UTF-8"
-        },
-        mode: "cors",
-        body : JSON.stringify(order)
-    }
-    fetch("http://localhost:3000/api/products/order", init)
-    .then(function(res){
-        if(res.ok)
-        {
-            return res.json();
-        }
-    })
-    .then(function(json){
-        sessionStorage.clear();
-        sessionStorage.setItem("jsonOrder", JSON.stringify(json));
-    });
-
-    setTimeout(function(){
+    requestAPI("order", true, order)
+    .then(function(recipe)
+    {
+        localStorage.clear();
+        console.log("recipe = "+ JSON.stringify(recipe[0]));
+        localStorage.setItem("order", JSON.stringify(recipe[0]))
         document.location.href = url + "confirmation.html";
-    },1000);
+    })
+    .catch(function(msg){
+        console.log(msg)
+    });
 }
 
 function productArray(array)
@@ -272,4 +227,47 @@ function productArray(array)
         }
     });
     return r
+}
+function getGrandParent(child)
+{
+    if(child.parentElement.tagName == "ARTICLE")
+        return child.parentElement;
+    else
+        return getGrandParent(child.parentElement);
+}
+
+function checkRegEx(element)
+{
+    var error = document.getElementById(element.id + "ErrorMsg");
+    error.innerHTML = "";
+
+    if(new RegExp(element.pattern).test(element.value))
+    {
+        return true
+    }
+    else
+    {
+        if(element.value.length > 0)
+        {
+            switch (element.id)
+            {
+                case "firstName" :
+                    error.innerHTML = "Ereur sur votre prenom, attention";
+                    break;
+                case "lastName" :
+                    error.innerHTML = "Erreur sur votre nom de famille, attention";
+                    break;
+                case "adress" :
+                    error.innerHTML = "Ceci n'est pas une adresse valide";
+                    break;
+                case "city" :
+                    error.innerHTML = "Ville inconnue";
+                    break;
+                case "email":
+                    error.innerHTML = "Ceci n'est pas un mail";
+                    break;
+            }
+        }
+        return false
+    }
 }

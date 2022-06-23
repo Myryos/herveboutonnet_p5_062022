@@ -1,44 +1,4 @@
-var paramID = "" + window.location.search.replace("?id=","");
-let jsonProduct = [];
-jsonProduct = requestAPI(paramID, false);
-
-setTimeout(function(){
-
-    jsonProduct.forEach(product => {
-        let divImg= document.getElementById("item_img");
-        let img = document.createElement("img")
-        let titleProduct = document.getElementById("title");
-        let price = document.getElementById("price");
-        let description = document.getElementById("description");
-        let quantity = document.getElementById("quantity")
-        let options = document.getElementById("colors");
-        let button = document.getElementById("addToCart");
-        let error = document.getElementById("colorErrorMsg");
-
-        
-        document.title = product.name;
-        img.setAttribute("src", product.imageUrl)
-        img.setAttribute("alt", product.altText)
-        divImg.appendChild(img);
-        titleProduct.innerHTML = product.name;
-        price.innerHTML = product.price;
-        description.innerHTML = product.description;
-        createColorsOption(options, product.colors);
-        options.onchange = function() {
-            error.innerHTML = "";
-        }
-        button.onclick = function() {
-            if(options.selectedIndex != 0)
-                saveSelection(product.name, product._id, quantity.value, options);
-            else
-                error.innerHTML = "Veuillez selectionner une couleur"
-            };
-
-            
-        
-    });
-},200);
-
+onCreate();
 
 //Creer les element html <option> pour le <sleect> id color
 function createColorsOption(optionsColors, colorsProducts)
@@ -55,7 +15,6 @@ function createColorsOption(optionsColors, colorsProducts)
 
 }
 
-
 //permet de sauvegarde la selection de l'acticle
 function saveSelection(name, id, quantity, color)
 {    
@@ -68,29 +27,92 @@ function saveSelection(name, id, quantity, color)
     };
     if(!checkStorage(key))
     {
-        sessionStorage.setItem( key, JSON.stringify(product));
+        localStorage.setItem( key, JSON.stringify(product));
     }
-    if(checkStorage(key))
+    else if(checkStorage(key))
     {
         updateQuantity(key, quantity);
     }
 }
 // REFAIRE LES 2 FONCTION 
-function checkS torage(key)
+function checkStorage(key)
 {
-    var bool;
-   
-        if(sessionStorage.key(i) == key)
+    var bool = false;
+    var check = true
+    
+    for(var i = 0; i < localStorage.length; i++)
+    {
+        if(localStorage.key(i) == key && check)
+        {
             bool = true;
-        else
+            check = false;
+        }
+        if(localStorage.key(i) != key && check)
+        {
             bool = false;
+        }
+    }
    return bool;
 
 }
 
+
 function updateQuantity(key, quantity)
 {
-    let product = sessionStorage(key);
-    let r = 0;
-    console.log(product);
+    let product =JSON.parse(localStorage.getItem(key));
+    
+    localStorage.removeItem(key);
+    
+    let r =parseInt(product.quantite) + parseInt(quantity);
+    
+    product.quantite = JSON.stringify(r);
+    
+    localStorage.setItem( key, JSON.stringify(product));
+}
+
+
+async function onCreate()
+{
+    var paramID = "" + window.location.search.replace("?id=","");
+    await requestAPI(paramID, false)
+    .then(function(json)
+    {
+        json.forEach(product => {
+            let divImg= document.getElementById("item_img");
+            let img = document.createElement("img")
+            let titleProduct = document.getElementById("title");
+            let price = document.getElementById("price");
+            let description = document.getElementById("description");
+            let quantity = document.getElementById("quantity")
+            let options = document.getElementById("colors");
+            let button = document.getElementById("addToCart");
+            let error = document.getElementById("colorErrorMsg");
+    
+            
+            document.title = product.name;
+            img.setAttribute("src", product.imageUrl)
+            img.setAttribute("alt", product.altText)
+            divImg.appendChild(img);
+            titleProduct.innerHTML = product.name;
+            price.innerHTML = product.price;
+            description.innerHTML = product.description;
+            createColorsOption(options, product.colors);
+            options.onchange = function() {
+                error.innerHTML = "";
+            }
+            button.onclick = function() 
+            {
+                if(options.selectedIndex != 0)
+                    saveSelection(product.name, product._id, quantity.value, options);
+                else
+                {
+                    error.innerHTML = "Veuillez selectionner une couleur"
+                };
+            }
+            })
+        })
+    .catch(function(msg)
+    {
+        console.log("Error : " + msg);
+    })
 }
