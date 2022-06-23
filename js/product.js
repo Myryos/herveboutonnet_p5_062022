@@ -66,13 +66,10 @@ function saveSelection(name, id, quantity, color)
         "couleur" : color.options[color.selectedIndex].text
     };
     if(!checkStorage(key))
-    {
         localStorage.setItem( key, JSON.stringify(product));
-    }
+    
     else if(checkStorage(key))
-    {
-        updateQuantity(key, quantity);
-    }
+        updateQuantity(key, quantity);   
 }
 // REFAIRE LES 2 FONCTION 
 function checkStorage(key)
@@ -95,8 +92,6 @@ function checkStorage(key)
    return bool;
 
 }
-
-
 function updateQuantity(key, quantity)
 {
     let product =JSON.parse(localStorage.getItem(key));
