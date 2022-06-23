@@ -1,84 +1,79 @@
 var productsCart = [];
-onCreate();
 
-
-async function onCreate()
+let productsInfos = [];
+var items = document.getElementById("cart__items");;
+var btnOrder = document.getElementById("order");
+var totalQuantity = document.getElementById("totalQuantity");
+var totalPrice = document.getElementById("totalPrice");
+var fName = document.getElementById("firstName");
+var lName = document.getElementById("lastName");
+var addr = document.getElementById("address");
+var city = document.getElementById("city");
+var mail = document.getElementById("email");
+let isOk = false;
+    
+for (var x = 0; x < localStorage.length; x++)
 {
+    productsCart.push(JSON.parse(localStorage.getItem(localStorage.key(x))));
+};
 
-    let productsInfos = [];
-    var items = document.getElementById("cart__items");;
-    var btnOrder = document.getElementById("order");
-    var totalQuantity = document.getElementById("totalQuantity");
-    var totalPrice = document.getElementById("totalPrice");
-    var fName = document.getElementById("firstName");
-    var lName = document.getElementById("lastName");
-    var addr = document.getElementById("address");
-    var city = document.getElementById("city");
-    var mail = document.getElementById("email");
-    let isOk = false;
-    
-    for (var x = 0; x < localStorage.length; x++)
+getInfo(productsCart)
+.then(function(array)
+{
+    productsInfos = array;
+    parseProducts(productsInfos, items, "cart", productsCart);
+
+    totalPrice.innerHTML = setCartPrice(productsCart, productsInfos);
+    totalQuantity.innerHTML = setCartQuant(productsCart);
+
+    items.onchange = function()
     {
-        productsCart.push(JSON.parse(localStorage.getItem(localStorage.key(x))));
+        updateCart(totalQuantity, totalPrice);
+    };
+    items.onclick =function(){
+    
+        updateCart(totalQuantity, totalPrice);
     };
 
-    getInfo(productsCart)
-    .then(function(array)
-    {
-        productsInfos = array;
-        parseProducts(productsInfos, items, "cart", productsCart);
-
-        totalPrice.innerHTML = setCartPrice(productsCart, productsInfos);
-        totalQuantity.innerHTML = setCartQuant(productsCart);
-
-        items.onchange = function()
+    var delItems = document.querySelectorAll("[class=deleteItem]");
+    delItems.forEach(element => {
+        element.onclick = function()
         {
-            updateCart(totalQuantity, totalPrice);
-        };
-        items.onclick =function(){
-    
-            updateCart(totalQuantity, totalPrice);
-        };
-
-        var delItems = document.querySelectorAll("[class=deleteItem]");
-        delItems.forEach(element => {
-            element.onclick = function()
+            for(var i = 0; i < productsCart.length; i++)
             {
-                for(var i = 0; i < productsCart.length; i++)
-                {
-                    delEventListener(element, productsCart[i].id);
-                }
-            }   
-        });
+                delEventListener(element, productsCart[i].id);
+            }
+        }   
     });
+});
 
-    //SET
+  
 
-    fName.onchange = function(){
-        //test le pattern/value
-        isOk = checkRegEx(fName);
-    };
-    lName.onchange = function(){
-        //test le pattern/value
-        isOk = checkRegEx(lName);
-    };
-    addr.onchange = function(){
-        isOk = checkRegEx(addr);
-    }
-    city.onchange = function(){
-        isOk = checkRegEx(city);
-    }
-    mail.onchange = function(){
-        isOk = checkRegEx(mail);
-    }
-
-    btnOrder.onclick = function(){
-        if(isOk)
-            submitOrder(productsCart, fName, lName, addr, city, mail);
-    };
-        
-        
+fName.onchange = function(){
+    //test le pattern/value
+    isOk = checkRegEx(fName);
+};
+lName.onchange = function(){
+    //test le pattern/value
+    isOk = checkRegEx(lName);
+};
+addr.onchange = function(){
+    isOk = checkRegEx(addr);
 }
+city.onchange = function(){
+    isOk = checkRegEx(city);
+}
+mail.onchange = function(){
+    isOk = checkRegEx(mail);
+}
+
+btnOrder.onclick = function(){
+    if(isOk)
+         submitOrder(productsCart, fName, lName, addr, city, mail);
+};
+        
+        
+
 //submitOrder(productsCart)
 
 function getInfo(array)

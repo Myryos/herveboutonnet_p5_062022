@@ -1,5 +1,45 @@
-onCreate();
-
+var paramID = "" + window.location.search.replace("?id=","");
+requestAPI(paramID, false)
+.then(function(json)
+{
+    json.forEach(product => {
+        let divImg= document.getElementById("item_img");
+        let img = document.createElement("img")
+        let titleProduct = document.getElementById("title");
+        let price = document.getElementById("price");
+        let description = document.getElementById("description");
+        let quantity = document.getElementById("quantity")
+        let options = document.getElementById("colors");
+        let button = document.getElementById("addToCart");
+        let error = document.getElementById("colorErrorMsg");
+    
+            
+        document.title = product.name;
+        img.setAttribute("src", product.imageUrl)
+        img.setAttribute("alt", product.altText)
+        divImg.appendChild(img);
+        titleProduct.innerHTML = product.name;
+        price.innerHTML = product.price;
+        description.innerHTML = product.description;
+        createColorsOption(options, product.colors);
+        options.onchange = function() {
+            error.innerHTML = "";
+        }
+        button.onclick = function() 
+        {
+            if(options.selectedIndex != 0)
+                saveSelection(product.name, product._id, quantity.value, options);
+            else
+            {
+                error.innerHTML = "Veuillez selectionner une couleur"
+            };
+        }
+    })
+})
+.catch(function(msg)
+{
+    console.log("Error : " + msg);
+})
 //Creer les element html <option> pour le <sleect> id color
 function createColorsOption(optionsColors, colorsProducts)
 {
@@ -68,51 +108,4 @@ function updateQuantity(key, quantity)
     product.quantite = JSON.stringify(r);
     
     localStorage.setItem( key, JSON.stringify(product));
-}
-
-
-async function onCreate()
-{
-    var paramID = "" + window.location.search.replace("?id=","");
-    await requestAPI(paramID, false)
-    .then(function(json)
-    {
-        json.forEach(product => {
-            let divImg= document.getElementById("item_img");
-            let img = document.createElement("img")
-            let titleProduct = document.getElementById("title");
-            let price = document.getElementById("price");
-            let description = document.getElementById("description");
-            let quantity = document.getElementById("quantity")
-            let options = document.getElementById("colors");
-            let button = document.getElementById("addToCart");
-            let error = document.getElementById("colorErrorMsg");
-    
-            
-            document.title = product.name;
-            img.setAttribute("src", product.imageUrl)
-            img.setAttribute("alt", product.altText)
-            divImg.appendChild(img);
-            titleProduct.innerHTML = product.name;
-            price.innerHTML = product.price;
-            description.innerHTML = product.description;
-            createColorsOption(options, product.colors);
-            options.onchange = function() {
-                error.innerHTML = "";
-            }
-            button.onclick = function() 
-            {
-                if(options.selectedIndex != 0)
-                    saveSelection(product.name, product._id, quantity.value, options);
-                else
-                {
-                    error.innerHTML = "Veuillez selectionner une couleur"
-                };
-            }
-            })
-        })
-    .catch(function(msg)
-    {
-        console.log("Error : " + msg);
-    })
 }
