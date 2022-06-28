@@ -1,10 +1,9 @@
-var orderID  = document.getElementById("orderId");
+let orderID  = document.getElementById("orderId");
 
-var json;
+let json;
 
-for (var x = 0; x < localStorage.length; x++){
+for (let x = 0; x < localStorage.length; x++){
     json = JSON.parse(localStorage.getItem(localStorage.key(x)));
-    console.log("JSON = " + json);
   };
 
 orderID.innerHTML = json.orderId;

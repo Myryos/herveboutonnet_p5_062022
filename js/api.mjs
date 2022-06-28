@@ -1,3 +1,5 @@
+//fonction qui envoie les requetes et qui gere les reponses 
+
 function requestAPI(mod, bool, order)
 {
     return new Promise((resolve, reject) => 
@@ -42,7 +44,7 @@ function requestAPI(mod, bool, order)
             //POURQUOI CA MARCHE ?!?!?!??!?!?!?!?
             if(value.length > 1)
             {
-                for(var i = 0 ; i < value.length; i++)
+                for(let i = 0 ; i < value.length; i++)
                 {
                     r.push(value[i]);
                 };

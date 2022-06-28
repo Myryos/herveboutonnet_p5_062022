@@ -1,3 +1,4 @@
+//Fonction quui permet de creer et parse les infos des produits
 function parseProducts(products, parent, type, cart)
 {
   if(type == "all")
@@ -20,7 +21,7 @@ function parseProducts(products, parent, type, cart)
   
   if(type == "cart")
   {
-    for (var i = 0; i < cart.length; i++)
+    for (let i = 0; i < cart.length; i++)
     {
         let p = `
         <article class="cart__item" id="item ${i}"data-id="{${cart[i].id}}" data-color="{${cart[i].couleur}}">

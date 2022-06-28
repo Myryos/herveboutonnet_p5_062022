@@ -1,18 +1,19 @@
-var productsCart = [];
+let productsCart = [];
 
 let productsInfos = [];
-var items = document.getElementById("cart__items");;
-var btnOrder = document.getElementById("order");
-var totalQuantity = document.getElementById("totalQuantity");
-var totalPrice = document.getElementById("totalPrice");
-var fName = document.getElementById("firstName");
-var lName = document.getElementById("lastName");
-var addr = document.getElementById("address");
-var city = document.getElementById("city");
-var mail = document.getElementById("email");
+let items = document.getElementById("cart__items");
+let divOrder = document.getElementById("cart__order");
+let btnOrder = document.getElementById("order");
+let totalQuantity = document.getElementById("totalQuantity");
+let totalPrice = document.getElementById("totalPrice");
+let fName = document.getElementById("firstName");
+let lName = document.getElementById("lastName");
+let addr = document.getElementById("address");
+let city = document.getElementById("city");
+let mail = document.getElementById("email");
 let isOk = false;
     
-for (var x = 0; x < localStorage.length; x++)
+for (let x = 0; x < localStorage.length; x++)
 {
     productsCart.push(JSON.parse(localStorage.getItem(localStorage.key(x))));
 };
@@ -34,12 +35,20 @@ getInfo(productsCart)
     
         updateCart(totalQuantity, totalPrice);
     };
+    divOrder.onclick == function()
+    {
+        isOk = checkRegEx(fName);
+        isOk = checkRegEx(lName);
+        isOk = checkRegEx(addr);
+        isOk = checkRegEx(city);
+        isOk = checkRegEx(mail);
+    }
 
-    var delItems = document.querySelectorAll("[class=deleteItem]");
+    let delItems = document.querySelectorAll("[class=deleteItem]");
     delItems.forEach(element => {
         element.onclick = function()
         {
-            for(var i = 0; i < productsCart.length; i++)
+            for(let i = 0; i < productsCart.length; i++)
             {
                 delEventListener(element, productsCart[i].id);
             }
@@ -68,19 +77,18 @@ mail.onchange = function(){
 }
 
 btnOrder.onclick = function(){
+    isOk = onClickRegEx([fName, lName, addr, city, mail])
     if(isOk)
          submitOrder(productsCart, fName, lName, addr, city, mail);
 };
-        
-        
+               
 
-//submitOrder(productsCart)
-
+//Prmet de lancer requestAPI() pour x objets de l'array.
 function getInfo(array)
 {
     return new Promise((resolve, reject) => {
         let info = [];
-        for (var i = 0; i < array.length; i++)
+        for (let i = 0; i < array.length; i++)
         {
             requestAPI(array[i].id, false)
             .then(function(jsons)
@@ -99,49 +107,52 @@ function getInfo(array)
     
 }
 
+// Set la quantite total au lancement de la page
 function setCartQuant(cart)
 {
-    var q = 0;
-    for(var i = 0; i < cart.length; i++)
+    let q = 0;
+    for(let i = 0; i < cart.length; i++)
     {
         q += parseInt(cart[i].quantite);
     }
-    var qq = "" + q;
+    let qq = "" + q;
     return qq;
 }
 
+//Set le prix total au lancement de la page
 function setCartPrice(cart, info)
 {
-    var p = 0;
-    for( var i = 0; i< cart.length; i++)
+    let p = 0;
+    for( let i = 0; i< cart.length; i++)
     {
         p += parseInt(cart[i].quantite) * parseInt(info[i].price);
     };
-    var pp = "" +  p;
+    let pp = "" +  p;
     return pp;
 }
 
-
+// Permet d'efface de toute part sur un bouton l'elemment html, vider la place d''une array et et vide le localstorage
 function delEventListener(element, id)
 {
     parent = getGrandParent(element);
 
     localStorage.removeItem(element.id);
 
-    for(var i = 0; i < productsCart.length; i++)
+    for(let i = 0; i < productsCart.length; i++)
     {
         if (id == productsCart[i].id)
         {
-            var tmp = productsCart.splice(i, 1);
+            let tmp = productsCart.splice(i, 1);
         }
     }
     parent.remove();  
 }
 
+//Tiens a jours le prix et la quantite total du panier
 function updateCart(totalQ,totalP)
 {
-    var allQuant = document.querySelectorAll("[class=itemQuantity]");
-    var allPrice = document.querySelectorAll("[class=price]");
+    let allQuant = document.querySelectorAll("[class=itemQuantity]");
+    let allPrice = document.querySelectorAll("[class=price]");
 
 
     totalQ.innerHTML = updateCartQuant(allQuant);
@@ -150,9 +161,10 @@ function updateCart(totalQ,totalP)
     updateItemQuant(productsCart, allQuant);
 }
 
+// Met a jour les quantite d'une array
 function updateItemQuant(array,allQuant)
 {
-    for(var i = 0; i < array.length; i++)
+    for(let i = 0; i < array.length; i++)
     {
         if(array[i].quantite != allQuant[i].value)
         {
@@ -161,34 +173,37 @@ function updateItemQuant(array,allQuant)
     }
 }
 
+// Met a jour et renvoie la quantite total du panier
 function updateCartQuant(array)
 {
-    var q = 0
-    for (var i = 0; i < array.length; i++)
+    let q = 0
+    for (let i = 0; i < array.length; i++)
     {
         q+= parseInt(array[i].value);
     }
-    var r = "" + q;
+    let r = "" + q;
     return r;
 }
 
+//Met a jour et renvoie le prix total du panier
 function updateCartPrice(array0, array1)
 {
-    var p = 0;
-    for(var i = 0; i < array0.length; i++)
+    let p = 0;
+    for(let i = 0; i < array0.length; i++)
     {   
         p += parseInt(array0[i].value) * parseInt(array1[i].innerHTML.replace(" €", ""));;
     }
-    var r = "" + p;
+    let r = "" + p;
     return r;
 }
 
+// Envoie la requete POST, recois et sauvegarde le recipe avant de changer de page
 function submitOrder(array, fName, lName, addr, city, mail)
 {
 
-    var url = document.location.href.replace("cart.html", "");
+    let url = document.location.href.replace("cart.html", "");
 
-    var order = {
+    let order = {
         "contact" : {
             "firstName" :  fName.value,
             "lastName" : lName.value,
@@ -211,18 +226,21 @@ function submitOrder(array, fName, lName, addr, city, mail)
     });
 }
 
+// Permet de parse dans une array n fois la quantité, l'id d'un produits du panier
 function productArray(array)
 {
-    var r = []
+    let r = []
     array.forEach(element => 
     {
-        for (var i = 0; i < element.quantite; i++)
+        for (let i = 0; i < element.quantite; i++)
         {
             r.push(element.id);
         }
     });
     return r
 }
+
+// Obtient le grand-parent d'un element HTML en recursifs
 function getGrandParent(child)
 {
     if(child.parentElement.tagName == "ARTICLE")
@@ -231,9 +249,10 @@ function getGrandParent(child)
         return getGrandParent(child.parentElement);
 }
 
+// Verifie si l'input du form corresponde a leur fonction 
 function checkRegEx(element)
 {
-    var error = document.getElementById(element.id + "ErrorMsg");
+    let error = document.getElementById(element.id + "ErrorMsg");
     error.innerHTML = "";
 
     if(new RegExp(element.pattern).test(element.value))
@@ -265,4 +284,23 @@ function checkRegEx(element)
         }
         return false
     }
+}
+
+//Verifie que tout les input ne soit pas vide
+function onClickRegEx(array)
+{
+    let bool = false;
+    let isVoid = 0;
+    let error;
+    array.forEach(element => {
+        if(element.value.length < 1)
+        {
+            error = document.getElementById(element.id + "ErrorMsg");
+            error.innerHTML = "Ce champ est vide";
+            isVoid +=1;
+        }
+    });
+    if(isVoid == 0)
+        bool = true;
+    return bool;
 }

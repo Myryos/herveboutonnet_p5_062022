@@ -1,4 +1,4 @@
-var paramID = "" + window.location.search.replace("?id=","");
+let paramID = "" + window.location.search.replace("?id=","");
 requestAPI(paramID, false)
 .then(function(json)
 {
@@ -40,13 +40,13 @@ requestAPI(paramID, false)
 {
     console.log("Error : " + msg);
 })
-//Creer les element html <option> pour le <sleect> id color
+//Creer les element html <option> pour le <select> id color
 function createColorsOption(optionsColors, colorsProducts)
 {
 
     colorsProducts.forEach(color => {
 
-        var colorOption = document.createElement("option");
+        let colorOption = document.createElement("option");
         colorOption.innerHTML = color;
         colorOption.setAttribute("value", color.toLowerCase());
         optionsColors.appendChild(colorOption);
@@ -59,7 +59,7 @@ function createColorsOption(optionsColors, colorsProducts)
 function saveSelection(name, id, quantity, color)
 {    
     let key  =  name + "/" + color.options[color.selectedIndex].text ;
-    var product = 
+    let product = 
     {
         "id" : id,
         "quantite" : quantity,
@@ -71,13 +71,14 @@ function saveSelection(name, id, quantity, color)
     else if(checkStorage(key))
         updateQuantity(key, quantity);   
 }
-// REFAIRE LES 2 FONCTION 
+
+//Permet de verifier si un key est deja utilise dans le localStorage
 function checkStorage(key)
 {
-    var bool = false;
-    var check = true
+    let bool = false;
+    let check = true
     
-    for(var i = 0; i < localStorage.length; i++)
+    for(let i = 0; i < localStorage.length; i++)
     {
         if(localStorage.key(i) == key && check)
         {
@@ -92,6 +93,9 @@ function checkStorage(key)
    return bool;
 
 }
+
+//Permet d'augmente la quantite du produits si la cle existe
+
 function updateQuantity(key, quantity)
 {
     let product =JSON.parse(localStorage.getItem(key));
