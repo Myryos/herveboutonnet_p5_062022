@@ -12,6 +12,13 @@ let addr = document.getElementById("address");
 let city = document.getElementById("city");
 let mail = document.getElementById("email");
 let isOk = false;
+let isFnOk = false;
+let isLnOk = false;
+let isAddrOk = false;
+let isCityOk = false;
+let isMailOk = false;
+let isNotEmpty = false;
+let arrayOk = []
     
 for (let x = 0; x < localStorage.length; x++)
 {
@@ -35,14 +42,6 @@ getInfo(productsCart)
     
         updateCart(totalQuantity, totalPrice);
     };
-    divOrder.onclick == function()
-    {
-        isOk = checkRegEx(fName);
-        isOk = checkRegEx(lName);
-        isOk = checkRegEx(addr);
-        isOk = checkRegEx(city);
-        isOk = checkRegEx(mail);
-    }
 
     let delItems = document.querySelectorAll("[class=deleteItem]");
     delItems.forEach(element => {
@@ -60,25 +59,43 @@ getInfo(productsCart)
 
 fName.onchange = function(){
     //test le pattern/value
-    isOk = checkRegEx(fName);
+    isFnOk = checkRegEx(fName);
+};
+fName.onclick = function(){
+    //test le pattern/value
+    isFnOk = checkRegEx(fName);
 };
 lName.onchange = function(){
     //test le pattern/value
-    isOk = checkRegEx(lName);
+    isLnOk = checkRegEx(lName);
+};
+lName.onclick = function(){
+    //test le pattern/value
+    isLnOk = checkRegEx(lName);
 };
 addr.onchange = function(){
-    isOk = checkRegEx(addr);
+    isAddrOk = checkRegEx(addr);
+}
+addr.onclick = function(){
+    isAddrOk = checkRegEx(addr);
 }
 city.onchange = function(){
-    isOk = checkRegEx(city);
+    isCityOk = checkRegEx(city);
+}
+city.onclick = function(){
+    isCityOk = checkRegEx(city);
 }
 mail.onchange = function(){
-    isOk = checkRegEx(mail);
+    isMailOk = checkRegEx(mail);
 }
-
+mail.onclick = function(){
+    isMailOk = checkRegEx(mail);
+}
 btnOrder.onclick = function(){
-    isOk = onClickRegEx([fName, lName, addr, city, mail])
-    if(isOk)
+    isNotEmpty = onClickRegEx([fName, lName, addr, city, mail]);
+    arrayOk = [isFnOk, isLnOk, isAddrOk, isCityOk, isMailOk, isNotEmpty];
+    isOk = checkIsOk(arrayOk);
+    if(isOk && productsCart.length > 0)
          submitOrder(productsCart, fName, lName, addr, city, mail);
 };
                
@@ -266,7 +283,7 @@ function checkRegEx(element)
             switch (element.id)
             {
                 case "firstName" :
-                    error.innerHTML = "Ereur sur votre prenom, attention";
+                    error.innerHTML = "Prenom non reconnu";
                     break;
                 case "lastName" :
                     error.innerHTML = "Erreur sur votre nom de famille, attention";
@@ -275,10 +292,10 @@ function checkRegEx(element)
                     error.innerHTML = "Ceci n'est pas une adresse valide";
                     break;
                 case "city" :
-                    error.innerHTML = "Ville inconnue";
+                    error.innerHTML = "Ville inconnue, Veuillez verifier l'orthographe";
                     break;
                 case "email":
-                    error.innerHTML = "Ceci n'est pas un mail";
+                    error.innerHTML = "Ceci n'est pas un mail, format correct : abc@abc.com";
                     break;
             }
         }
@@ -303,4 +320,19 @@ function onClickRegEx(array)
     if(isVoid == 0)
         bool = true;
     return bool;
+}
+
+function checkIsOk(array)
+{
+    let i = 0;
+
+    array.forEach(element => {
+        if(element)
+            i++;
+    });
+
+    if(i == array.length)
+        return true;
+    else
+        return false;
 }
