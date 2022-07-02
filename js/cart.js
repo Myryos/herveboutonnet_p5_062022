@@ -272,8 +272,13 @@ function checkRegEx(element)
     let error = document.getElementById(element.id + "ErrorMsg");
     error.innerHTML = "";
 
-    if(new RegExp(element.pattern).test(element.value))
+    if(new RegExp(element.pattern).test(element.value) && element.id != "email")
     {
+        return true
+    }
+    else if (new RegExp(element.pattern).test(element.value) && strMail(element.value)) 
+    {
+        console.log("Tu as reussi")
         return true
     }
     else
@@ -335,4 +340,20 @@ function checkIsOk(array)
         return true;
     else
         return false;
+}
+
+function strMail(str)
+{
+    count = 0;
+
+    for (let i = 0; i < str.length; i++)
+    {
+        if(str[i] == '@')
+            count += 1;
+    }
+
+    if (count == 1 )
+        return true
+    else
+        return false
 }
